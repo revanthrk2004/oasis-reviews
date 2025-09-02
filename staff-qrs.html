@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Staff QR Generator</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0;padding:2rem;background:#fafafa}
+    h1{margin:0 0 1rem 0}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+    .card{background:#fff;border:1px solid #eee;border-radius:14px;padding:1rem;display:flex;flex-direction:column;align-items:center;gap:.6rem}
+    .name{font-weight:700}
+    .url{font-size:.8rem;word-break:break-all;color:#555}
+    .qr{width:200px;height:200px}
+    @media print {.url{display:none} body{padding:0}}
+  </style>
+</head>
+<body>
+  <h1>Oasis Bar &amp; Terrace — Staff QR Codes</h1>
+  <div class="grid" id="grid"></div>
+
+  <!-- QRCode library (tiny, client-side) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" integrity="sha512-MtLZ0ZVtT/8K8l3d0wYx6V3D6p+9b0xY6h0N6hI4mX0pV7V4v2n3ZcS2CwT5l3k7kq4z8C7k4I3c1OEUZ1N1fQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    // ====== CONFIG ======
+    const BASE = "https://YOUR_DOMAIN_OR_PATH/review.html"; // e.g. https://oasis.example.com/review.html
+
+    const STAFF = [
+      "Adnan",
+      "Aiden",
+      "Raven",
+      "Revanth",
+      "Ishika",
+      "Maria",
+      "Daniel",
+      // add more...
+    ];
+
+    function makeCard(name, url){
+      const card = document.createElement('div');
+      card.className = 'card';
+      const title = document.createElement('div');
+      title.className = 'name';
+      title.textContent = name;
+      const link = document.createElement('div');
+      link.className = 'url';
+      link.textContent = url;
+      const qrWrap = document.createElement('div');
+      qrWrap.className = 'qr';
+      card.appendChild(title);
+      card.appendChild(qrWrap);
+      card.appendChild(link);
+      new QRCode(qrWrap, { text: url, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
+      return card;
+    }
+
+    const grid = document.getElementById('grid');
+    STAFF.forEach(name => {
+      const url = `${BASE}?staff=${encodeURIComponent(name)}`;
+      grid.appendChild(makeCard(name, url));
+    });
+  </script>
+</body>
+</html>

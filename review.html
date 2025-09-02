@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Leave a review</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0;padding:2rem;display:grid;place-items:center;min-height:100vh;background:#f7f7f8}
+    .card{max-width:560px;width:100%;background:#fff;border:1px solid #eee;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,0.06);padding:1.5rem}
+    h1{margin:0 0 .5rem 0;font-size:1.4rem}
+    p{margin:.4rem 0;color:#444}
+    button{margin-top:1rem;border:0;background:#111;color:#fff;padding:.9rem 1.1rem;border-radius:12px;font-weight:600;cursor:pointer}
+    .note{font-size:.9rem;color:#666}
+    .ok{color:#0a7d27;font-weight:600}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Thanks for reviewing Oasis Bar &amp; Terrace 💛</h1>
+    <p id="msg">Preparing your review text…</p>
+    <button id="openBtn" style="display:none">Open Google review form</button>
+    <p class="note">Tip: you’ll see “Paste” pop up on your phone’s keyboard. Just paste and submit.</p>
+  </div>
+
+  <script>
+    // ====== CONFIG: put your final Google "write a review" link here ======
+    // Best practice link (needs your Place ID):
+    //   https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID
+    //
+    // You can also use your GBP short link if you have it, e.g.:
+    //   https://g.page/r/SHORT_ID/review
+    //
+    // TEMP: this is the normal Maps place link you gave. It works,
+    // but if you replace it with the 'writereview' link, it opens the form directly.
+    const REVIEW_URL = "https://search.google.com/local/writereview?placeid=ChIJmazmXKEDdkgR3hgEtNS3-hY";
+
+    // ====== Build staff-specific message ======
+    const params = new URLSearchParams(location.search);
+    const staff = (params.get("staff") || "your team").trim();
+    const template = `I was served by ${staff} and had a great experience at Oasis Bar & Terrace. Thank you!`;
+
+    const msgEl = document.getElementById("msg");
+    const btn = document.getElementById("openBtn");
+
+    async function copyAndOpen() {
+      try {
+        // Try to copy first so mobile shows "Paste" suggestion
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(template);
+          msgEl.innerHTML = `Review text copied for <span class="ok">${staff}</span>. Opening Google now…`;
+        } else {
+          msgEl.textContent = `Copy this text, then tap the button: "${template}"`;
+          btn.style.display = "inline-block";
+          return;
+        }
+
+        // Try auto-open in same tab (reduces popup blockers)
+        window.location.href = REVIEW_URL;
+      } catch (e) {
+        // Fallback UI
+        msgEl.textContent = `Copy this text, then tap the button: "${template}"`;
+        btn.style.display = "inline-block";
+      }
+    }
+
+    // Auto-run for scan-and-go flow
+    copyAndOpen();
+
+    // Manual fallback button
+    btn.addEventListener("click", () => {
+      if (navigator.clipboard?.writeText) navigator.clipboard.writeText(template);
+      window.location.href = REVIEW_URL;
+    });
+  </script>
+</body>
+</html>
