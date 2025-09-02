@@ -2,85 +2,127 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Leave a review</title>
+  <title>Oasis Bar & Terrace — Leave a Review</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="color-scheme" content="light dark" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+
   <style>
-    :root { --bg:#f7f7f8; --card:#fff; --text:#222; --muted:#666; --ok:#0a7d27 }
-    @media (prefers-color-scheme: dark){
-      :root { --bg:#0b0b0c; --card:#151518; --text:#f3f3f4; --muted:#c6c6c9 }
+    :root {
+      --cream:#F6F4EF;
+      --teal:#013D3B;
+      --text-dark:#0C2A2A;
+      --muted:#555;
     }
-    html,body{height:100%}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0;background:var(--bg);display:grid;place-items:center}
-    .card{max-width:640px;width:100%;background:var(--card);border:1px solid rgba(0,0,0,.08);border-radius:18px;box-shadow:0 8px 28px rgba(0,0,0,.08);padding:1.25rem}
-    h1{margin:.2rem 0 .4rem 0;font-size:1.25rem;color:var(--text)}
-    p{margin:.4rem 0;color:var(--muted);line-height:1.4}
-    .strong{color:var(--text);font-weight:600}
-    .ok{color:var(--ok);font-weight:700}
-    .steps{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
-    .chip{border:1px dashed rgba(0,0,0,.18);padding:.4rem .6rem;border-radius:999px;font-size:.9rem;color:var(--muted)}
-    .btn{display:inline-block;margin-top:.8rem;border:0;background:#111;color:#fff;padding:.8rem 1rem;border-radius:12px;font-weight:700;cursor:pointer}
-    .hidden{display:none}
+    body {
+      margin:0; padding:0;
+      font-family:Inter, sans-serif;
+      background:var(--cream);
+      color:var(--text-dark);
+    }
+    header {
+      background:var(--teal);
+      color:#fff;
+      padding:1.2rem;
+      text-align:center;
+    }
+    header h1 {
+      font-family:Montserrat, sans-serif;
+      font-weight:800;
+      margin:0;
+      letter-spacing:.05em;
+    }
+    header small { display:block; margin-top:.3rem; font-size:.9rem; }
+
+    .wrapper { max-width:700px; margin:2rem auto; padding:0 1rem; }
+
+    .card {
+      background:var(--teal);
+      color:#fff;
+      border-radius:16px;
+      padding:1.5rem;
+      box-shadow:0 8px 20px rgba(0,0,0,.1);
+    }
+
+    .title { font:700 1.4rem/1.3 Montserrat, sans-serif; margin:0 0 .5rem; }
+    .subtitle { margin:0 0 1rem; color:#ddd; }
+
+    .steps { margin:1rem 0; display:flex; flex-wrap:wrap; gap:.5rem; }
+    .pill {
+      border:1px solid rgba(255,255,255,.4);
+      padding:.4rem .7rem;
+      border-radius:999px;
+      font-size:.85rem;
+      color:#fff;
+      background:rgba(255,255,255,.08);
+    }
+
+    .cta {
+      display:inline-block;
+      background:#fff;
+      color:var(--teal);
+      border:0;
+      padding:.8rem 1.2rem;
+      border-radius:30px;
+      font-weight:700;
+      font-family:Montserrat, sans-serif;
+      cursor:pointer;
+      margin-top:.8rem;
+    }
+    .status { margin-top:.5rem; font-size:.9rem; color:#eee; }
+    .ok { color:#F6F4EF; font-weight:700; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Thanks for reviewing Oasis Bar &amp; Terrace 💛</h1>
-    <p id="status">Getting things ready…</p>
-    <div class="steps">
-      <div class="chip">1) We copy your text</div>
-      <div class="chip">2) We open Google</div>
-      <div class="chip">3) <span class="strong">Tap the box → Paste</span></div>
-      <div class="chip">4) Choose stars → Submit</div>
+  <header>
+    <h1>OASIS BAR & TERRACE</h1>
+    <small>Canada Square Park · Canary Wharf</small>
+  </header>
+
+  <div class="wrapper">
+    <div class="card">
+      <div class="title">Leave us a review</div>
+      <p class="subtitle">We’ll copy your text and open Google’s review box — just paste and submit.</p>
+
+      <div id="status" class="status">Preparing…</div>
+      <div class="steps">
+        <span class="pill">1) Text copied</span>
+        <span class="pill">2) Google opens</span>
+        <span class="pill">3) Tap → Paste</span>
+        <span class="pill">4) Choose stars → Submit</span>
+      </div>
+      <button id="openBtn" class="cta" style="display:none">Open Google Review</button>
     </div>
-    <button id="openBtn" class="btn hidden">Open Google review form</button>
   </div>
 
   <script>
-    // ✅ Your direct write-a-review link (opens the dialog immediately)
     const REVIEW_URL = "https://search.google.com/local/writereview?placeid=ChIJmazmXKEDdkgR3hgEtNS3-hY";
-
-    // Fallback (only used if something blocks the above)
-    const FALLBACK_URL = "https://www.google.com/maps/place/Oasis+Bar+%26+Terrace/";
-
     const params = new URLSearchParams(location.search);
-    const staff = (params.get("staff") || "your team").trim();
-
-    // Keep this short so iOS/Android shows the paste chip clearly
+    const staff = (params.get("staff") || "our team").trim();
     const template = `I was served by ${staff} and had a great experience at Oasis Bar & Terrace. Thank you!`;
 
-    const status = document.getElementById("status");
+    const statusEl = document.getElementById("status");
     const btn = document.getElementById("openBtn");
 
-    async function run() {
-      try {
-        // 1) Copy first so mobile shows the Paste suggestion
-        if (navigator.clipboard?.writeText) {
+    async function run(){
+      try{
+        if(navigator.clipboard?.writeText){
           await navigator.clipboard.writeText(template);
-          status.innerHTML = `Review text copied for <span class="ok">${staff}</span>.`;
+          statusEl.innerHTML = `Review text copied for <span class="ok">${staff}</span>. Opening Google…`;
         } else {
-          status.textContent = `Copy this text, then tap the button: "${template}"`;
-          btn.classList.remove("hidden");
+          statusEl.textContent = `Copy this text manually: "${template}"`;
+          btn.style.display="inline-block";
           return;
         }
-
-        // 2) Brief pause helps iOS/Android surface the paste UI
-        await new Promise(r => setTimeout(r, 800));
-
-        // 3) Open Google review dialog (same-tab to avoid popup blockers)
-        status.innerHTML += ` Opening Google now…`;
+        await new Promise(r=>setTimeout(r,800));
         location.href = REVIEW_URL;
-      } catch (e) {
-        status.textContent = `Copy this text, then tap the button: "${template}"`;
-        btn.classList.remove("hidden");
+      }catch(e){
+        statusEl.textContent = `Copy this text: "${template}"`;
+        btn.style.display="inline-block";
       }
     }
-
-    btn.addEventListener("click", () => {
-      if (navigator.clipboard?.writeText) navigator.clipboard.writeText(template);
-      location.href = REVIEW_URL || FALLBACK_URL;
-    });
-
+    btn.addEventListener("click", ()=>{ if(navigator.clipboard?.writeText) navigator.clipboard.writeText(template); location.href=REVIEW_URL; });
     run();
   </script>
 </body>
