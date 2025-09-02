@@ -4,73 +4,84 @@
   <meta charset="utf-8" />
   <title>Leave a review</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0;padding:2rem;display:grid;place-items:center;min-height:100vh;background:#f7f7f8}
-    .card{max-width:560px;width:100%;background:#fff;border:1px solid #eee;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,0.06);padding:1.5rem}
-    h1{margin:0 0 .5rem 0;font-size:1.4rem}
-    p{margin:.4rem 0;color:#444}
-    button{margin-top:1rem;border:0;background:#111;color:#fff;padding:.9rem 1.1rem;border-radius:12px;font-weight:600;cursor:pointer}
-    .note{font-size:.9rem;color:#666}
-    .ok{color:#0a7d27;font-weight:600}
+    :root { --bg:#f7f7f8; --card:#fff; --text:#222; --muted:#666; --ok:#0a7d27 }
+    @media (prefers-color-scheme: dark){
+      :root { --bg:#0b0b0c; --card:#151518; --text:#f3f3f4; --muted:#c6c6c9 }
+    }
+    html,body{height:100%}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;margin:0;background:var(--bg);display:grid;place-items:center}
+    .card{max-width:640px;width:100%;background:var(--card);border:1px solid rgba(0,0,0,.08);border-radius:18px;box-shadow:0 8px 28px rgba(0,0,0,.08);padding:1.25rem}
+    h1{margin:.2rem 0 .4rem 0;font-size:1.25rem;color:var(--text)}
+    p{margin:.4rem 0;color:var(--muted);line-height:1.4}
+    .strong{color:var(--text);font-weight:600}
+    .ok{color:var(--ok);font-weight:700}
+    .steps{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+    .chip{border:1px dashed rgba(0,0,0,.18);padding:.4rem .6rem;border-radius:999px;font-size:.9rem;color:var(--muted)}
+    .btn{display:inline-block;margin-top:.8rem;border:0;background:#111;color:#fff;padding:.8rem 1rem;border-radius:12px;font-weight:700;cursor:pointer}
+    .hidden{display:none}
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Thanks for reviewing Oasis Bar &amp; Terrace 💛</h1>
-    <p id="msg">Preparing your review text…</p>
-    <button id="openBtn" style="display:none">Open Google review form</button>
-    <p class="note">Tip: you’ll see “Paste” pop up on your phone’s keyboard. Just paste and submit.</p>
+    <p id="status">Getting things ready…</p>
+    <div class="steps">
+      <div class="chip">1) We copy your text</div>
+      <div class="chip">2) We open Google</div>
+      <div class="chip">3) <span class="strong">Tap the box → Paste</span></div>
+      <div class="chip">4) Choose stars → Submit</div>
+    </div>
+    <button id="openBtn" class="btn hidden">Open Google review form</button>
   </div>
 
   <script>
-    // ====== CONFIG: put your final Google "write a review" link here ======
-    // Best practice link (needs your Place ID):
-    //   https://search.google.com/local/writereview?placeid=YOUR_PLACE_ID
-    //
-    // You can also use your GBP short link if you have it, e.g.:
-    //   https://g.page/r/SHORT_ID/review
-    //
-    // TEMP: this is the normal Maps place link you gave. It works,
-    // but if you replace it with the 'writereview' link, it opens the form directly.
+    // ✅ Your direct write-a-review link (opens the dialog immediately)
     const REVIEW_URL = "https://search.google.com/local/writereview?placeid=ChIJmazmXKEDdkgR3hgEtNS3-hY";
 
-    // ====== Build staff-specific message ======
+    // Fallback (only used if something blocks the above)
+    const FALLBACK_URL = "https://www.google.com/maps/place/Oasis+Bar+%26+Terrace/";
+
     const params = new URLSearchParams(location.search);
     const staff = (params.get("staff") || "your team").trim();
+
+    // Keep this short so iOS/Android shows the paste chip clearly
     const template = `I was served by ${staff} and had a great experience at Oasis Bar & Terrace. Thank you!`;
 
-    const msgEl = document.getElementById("msg");
+    const status = document.getElementById("status");
     const btn = document.getElementById("openBtn");
 
-    async function copyAndOpen() {
+    async function run() {
       try {
-        // Try to copy first so mobile shows "Paste" suggestion
+        // 1) Copy first so mobile shows the Paste suggestion
         if (navigator.clipboard?.writeText) {
           await navigator.clipboard.writeText(template);
-          msgEl.innerHTML = `Review text copied for <span class="ok">${staff}</span>. Opening Google now…`;
+          status.innerHTML = `Review text copied for <span class="ok">${staff}</span>.`;
         } else {
-          msgEl.textContent = `Copy this text, then tap the button: "${template}"`;
-          btn.style.display = "inline-block";
+          status.textContent = `Copy this text, then tap the button: "${template}"`;
+          btn.classList.remove("hidden");
           return;
         }
 
-        // Try auto-open in same tab (reduces popup blockers)
-        window.location.href = REVIEW_URL;
+        // 2) Brief pause helps iOS/Android surface the paste UI
+        await new Promise(r => setTimeout(r, 800));
+
+        // 3) Open Google review dialog (same-tab to avoid popup blockers)
+        status.innerHTML += ` Opening Google now…`;
+        location.href = REVIEW_URL;
       } catch (e) {
-        // Fallback UI
-        msgEl.textContent = `Copy this text, then tap the button: "${template}"`;
-        btn.style.display = "inline-block";
+        status.textContent = `Copy this text, then tap the button: "${template}"`;
+        btn.classList.remove("hidden");
       }
     }
 
-    // Auto-run for scan-and-go flow
-    copyAndOpen();
-
-    // Manual fallback button
     btn.addEventListener("click", () => {
       if (navigator.clipboard?.writeText) navigator.clipboard.writeText(template);
-      window.location.href = REVIEW_URL;
+      location.href = REVIEW_URL || FALLBACK_URL;
     });
+
+    run();
   </script>
 </body>
 </html>
