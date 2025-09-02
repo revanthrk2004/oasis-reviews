@@ -4,9 +4,6 @@
   <meta charset="utf-8" />
   <title>Oasis Bar & Terrace — Leave a Review</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <!-- Safety net: if everything else is blocked, redirect after 8s -->
-  <meta http-equiv="refresh" content="8;url=https://search.google.com/local/writereview?placeid=ChIJmazmXKEDdkgR3hgEtNS3-hY">
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
@@ -18,31 +15,71 @@
       --text-dark:#0C2A2A;
       --muted:#555;
     }
-    body { margin:0; padding:0; font-family:Inter, sans-serif; background:var(--cream); color:var(--text-dark); }
-    header { background:var(--teal); color:#fff; padding:1.2rem; text-align:center; }
-    header img { max-height:80px; object-fit:contain; display:block; margin:0 auto .35rem; }
-    header small { display:block; margin-top:.3rem; font-size:.9rem; opacity:.9; }
+    body {
+      margin:0; padding:0;
+      font-family:Inter, sans-serif;
+      background:var(--cream);
+      color:var(--text-dark);
+    }
+    header {
+      background:var(--teal);
+      color:#fff;
+      padding:1.2rem;
+      text-align:center;
+    }
+    header h1 {
+      font-family:Montserrat, sans-serif;
+      font-weight:800;
+      margin:0;
+      letter-spacing:.05em;
+    }
+    header small { display:block; margin-top:.3rem; font-size:.9rem; }
 
     .wrapper { max-width:700px; margin:2rem auto; padding:0 1rem; }
 
-    .card { background:var(--teal); color:#fff; border-radius:16px; padding:1.5rem; box-shadow:0 8px 20px rgba(0,0,0,.1); }
+    .card {
+      background:var(--teal);
+      color:#fff;
+      border-radius:16px;
+      padding:1.5rem;
+      box-shadow:0 8px 20px rgba(0,0,0,.1);
+    }
+
     .title { font:700 1.4rem/1.3 Montserrat, sans-serif; margin:0 0 .5rem; }
-    .subtitle { margin:0 0 1rem; color:#e9e9e9; }
+    .subtitle { margin:0 0 1rem; color:#ddd; }
 
     .steps { margin:1rem 0; display:flex; flex-wrap:wrap; gap:.5rem; }
-    .pill { border:1px solid rgba(255,255,255,.4); padding:.4rem .7rem; border-radius:999px; font-size:.85rem; color:#fff; background:rgba(255,255,255,.08); }
+    .pill {
+      border:1px solid rgba(255,255,255,.4);
+      padding:.4rem .7rem;
+      border-radius:999px;
+      font-size:.85rem;
+      color:#fff;
+      background:rgba(255,255,255,.08);
+    }
 
-    .cta { display:inline-block; background:#fff; color:var(--teal); border:0; padding:.8rem 1.2rem; border-radius:30px; font-weight:700; font-family:Montserrat, sans-serif; cursor:pointer; margin-top:.8rem; }
-    .status { margin-top:.5rem; font-size:.95rem; color:#f0f0f0; }
+    .cta {
+      display:inline-block;
+      background:#fff;
+      color:var(--teal);
+      border:0;
+      padding:.8rem 1.2rem;
+      border-radius:30px;
+      font-weight:700;
+      font-family:Montserrat, sans-serif;
+      cursor:pointer;
+      margin-top:.8rem;
+    }
+    .status { margin-top:.5rem; font-size:.9rem; color:#eee; }
     .ok { color:#F6F4EF; font-weight:700; }
   </style>
 </head>
 <body>
-  <header>
-    <!-- make sure this file exists in your repo -->
-    <img src="/assets/logo.png" alt="Oasis Bar & Terrace" />
-    <small>Canada Square Park · Canary Wharf</small>
-  </header>
+<header>
+  <img src="/assets/logo.png" alt="Oasis Bar & Terrace" style="max-height:80px; object-fit:contain;" />
+  <small>Canada Square Park · Canary Wharf</small>
+</header>
+
 
   <div class="wrapper">
     <div class="card">
@@ -62,59 +99,31 @@
 
   <script>
     const REVIEW_URL = "https://search.google.com/local/writereview?placeid=ChIJmazmXKEDdkgR3hgEtNS3-hY";
-
     const params = new URLSearchParams(location.search);
     const staff = (params.get("staff") || "our team").trim();
     const template = `I was served by ${staff} and had a great experience at Oasis Bar & Terrace. Thank you!`;
 
     const statusEl = document.getElementById("status");
     const btn = document.getElementById("openBtn");
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-    const openReview = () => {
-      // replace() avoids adding to history; better back-button behavior
-      location.replace(REVIEW_URL);
-    };
 
     async function run(){
-      // 1) Copy text (for the paste chip)
-      try {
-        if (navigator.clipboard?.writeText) {
+      try{
+        if(navigator.clipboard?.writeText){
           await navigator.clipboard.writeText(template);
           statusEl.innerHTML = `Review text copied for <span class="ok">${staff}</span>. Opening Google…`;
         } else {
-          throw new Error("Clipboard unavailable");
+          statusEl.textContent = `Copy this text manually: "${template}"`;
+          btn.style.display="inline-block";
+          return;
         }
-      } catch {
-        statusEl.textContent = `Copy this text, then tap the button: "${template}"`;
-        btn.style.display = "inline-block";
-        return;
+        await new Promise(r=>setTimeout(r,800));
+        location.href = REVIEW_URL;
+      }catch(e){
+        statusEl.textContent = `Copy this text: "${template}"`;
+        btn.style.display="inline-block";
       }
-
-      // 2) Give mobile OS a bit more time to surface paste UI
-      await new Promise(r => setTimeout(r, isMobile ? 1200 : 600));
-
-      // 3) Try redirect; retry a few times if we’re still visible
-      let tries = 0;
-      const maxTries = 3;
-      const attempt = () => {
-        if (document.visibilityState === "hidden") return; // already navigated
-        tries += 1;
-        openReview();
-        if (tries < maxTries) {
-          setTimeout(attempt, isMobile ? 1500 : 800);
-        } else {
-          btn.style.display = "inline-block"; // manual fallback
-        }
-      };
-      attempt();
     }
-
-    btn.addEventListener("click", () => {
-      if (navigator.clipboard?.writeText) navigator.clipboard.writeText(template);
-      openReview();
-    });
-
+    btn.addEventListener("click", ()=>{ if(navigator.clipboard?.writeText) navigator.clipboard.writeText(template); location.href=REVIEW_URL; });
     run();
   </script>
 </body>
