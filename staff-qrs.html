@@ -11,40 +11,77 @@
     :root{ --cream:#F6F4EF; --teal:#013D3B; --text:#0C2A2A; --muted:#555; }
     body{ margin:0; font-family:Inter, sans-serif; background:var(--cream); color:var(--text);}
     header{ background:var(--teal); color:#fff; padding:1rem; text-align:center; }
-    h1{ font-family:Montserrat, sans-serif; font-weight:800; font-size:1.5rem; margin:0; }
     .sub{ color:#ddd; margin-top:.3rem; }
+
     .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem; padding:1.5rem;}
-    .card{ background:#fff; border:2px solid var(--teal); border-radius:14px; padding:1rem; display:flex; flex-direction:column; align-items:center; box-shadow:0 6px 16px rgba(0,0,0,.08);}
-    .name{ font-weight:700; margin-bottom:.5rem; color:var(--teal); }
-    .url{ font-size:.8rem; color:var(--muted); word-break:break-all; text-align:center; margin-top:.4rem;}
+
+    .card{
+      background:#fff; border:2px solid var(--teal); border-radius:14px; padding:1rem;
+      display:flex; flex-direction:column; align-items:center; gap:.5rem;
+      box-shadow:0 6px 16px rgba(0,0,0,.08);
+    }
+    .name{ font-weight:700; margin-bottom:.25rem; color:var(--teal); }
     .qr{ width:200px; height:200px; }
+    .url{ display:none; } 
+
+    
+    .brandlogo{
+      max-height:36px;
+      object-fit:contain;
+      display:block;
+      margin-top:.15rem;
+    }
+
+    @media print{
+      body{background:#fff}
+      header,.sub{display:none}
+      .card{box-shadow:none}
+    }
   </style>
 </head>
 <body>
 <header>
-  <img src="/assets/logo.png" alt="Oasis Bar & Terrace" style="max-height:80px; object-fit:contain;" />
+  <img src="/assets/logo1.png" alt="Oasis Bar & Terrace" style="max-height:80px; object-fit:contain;" />
   <div class="sub">Staff QR Codes</div>
 </header>
 
+<div id="grid" class="grid"></div>
 
-  <div id="grid" class="grid"></div>
+<script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+  const BASE = "https://oasis-reviews.vercel.app/review.html";
+  const STAFF = ["Jamel","Aisha","Ali","Anik","Anish","Brad","Callum","Chanakya","Chandrika","Chloe","Chola","Darani","Dasha","Teddy","Faye","Sai","Kartheek","Kiran","Laurynas","Lewis","Matin","Bora","Osaro","Petar","Revanth","Rhianna","Stefano","Sufaila","Roman","Tommi","Tre"];
 
-  <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
-  <script>
-    const BASE = "https://oasis-reviews.vercel.app/review.html";
-    const STAFF = ["Jamel","Aisha","Ali","Anik","Anish","Brad","Callum", "Chanakya", "Chandrika", "Chloe", "Chola", "Darani", "Dasha", "Teddy", "Faye", "Sai", "Kartheek", "Kiran", "Laurynas", "Lewis", "Matin", "Bora", "Osaro", "Petar", "Revanth", "Rhianna", "Stefano", "Sufaila", "Roman", "Tommi", "Tre",]; 
+  function makeCard(name, url){
+    const card = document.createElement('div');
+    card.className = 'card';
 
-    function makeCard(name,url){
-      const card=document.createElement('div'); card.className='card';
-      const title=document.createElement('div'); title.className='name'; title.textContent=name;
-      const qrWrap=document.createElement('div'); qrWrap.className='qr';
-      const link=document.createElement('div'); link.className='url'; link.textContent=url;
-      card.appendChild(title); card.appendChild(qrWrap); card.appendChild(link);
-      new QRCode(qrWrap,{text:url,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
-      return card;
-    }
-    const grid=document.getElementById('grid');
-    STAFF.forEach(n=>{ const url=`${BASE}?staff=${encodeURIComponent(n)}`; grid.appendChild(makeCard(n,url)); });
-  </script>
+    const title = document.createElement('div');
+    title.className = 'name';
+    title.textContent = name;
+
+    const qrWrap = document.createElement('div');
+    qrWrap.className = 'qr';
+
+   
+    const logo = document.createElement('img');
+    logo.src = '/assets/logo.png';     
+    logo.alt = 'Oasis Bar & Terrace';
+    logo.className = 'brandlogo';
+
+    card.appendChild(title);
+    card.appendChild(qrWrap);
+    card.appendChild(logo);
+
+    new QRCode(qrWrap, { text: url, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
+    return card;
+  }
+
+  const grid = document.getElementById('grid');
+  STAFF.forEach(n => {
+    const url = `${BASE}?staff=${encodeURIComponent(n)}`;
+    grid.appendChild(makeCard(n, url));
+  });
+</script>
 </body>
 </html>
