@@ -24,13 +24,23 @@
     .qr{ width:200px; height:200px; }
     .url{ display:none; } 
 
-    
-    .brandlogo{
-      max-height:36px;
-      object-fit:contain;
-      display:block;
-      margin-top:.15rem;
+   
+    .note{
+      margin-top:.35rem;
+      font:600 .95rem/1.2 Inter, sans-serif;
+      color:#013D3B;
+      text-align:center;
     }
+
+   
+    .brandlogo{
+     max-height:60px;      
+     max-width:90%;        
+     object-fit:contain;
+     display:block;
+     margin-top:.35rem;
+    }
+
 
     @media print{
       body{background:#fff}
@@ -63,14 +73,20 @@
     const qrWrap = document.createElement('div');
     qrWrap.className = 'qr';
 
-   
+    
+    const note = document.createElement('div');
+    note.className = 'note';
+    note.textContent = 'Please leave us a review';
+
+    
     const logo = document.createElement('img');
-    logo.src = '/assets/logo1.png';     
+    logo.src = '/assets/logo1.png';
     logo.alt = 'Oasis Bar & Terrace';
     logo.className = 'brandlogo';
 
     card.appendChild(title);
     card.appendChild(qrWrap);
+    card.appendChild(note);
     card.appendChild(logo);
 
     new QRCode(qrWrap, { text: url, width: 200, height: 200, correctLevel: QRCode.CorrectLevel.M });
