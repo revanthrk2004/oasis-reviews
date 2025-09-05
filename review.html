@@ -121,11 +121,11 @@
       // If navigation is blocked, user can tap buttons below.
       setTimeout(() => {
         if (document.visibilityState !== "hidden") {
-          statusEl.textContent = "If it didn’t open, tap one of the buttons below.";
+          statusEl.textContent = "Choose where you would like to leave your review:";
         }
       }, isMobile ? 1800 : 900);
     } catch {
-      statusEl.textContent = "Copy failed — please tap a button below.";
+      statusEl.textContent = "Choose where you would like to leave your review:";
     }
   })();
 
