@@ -12,7 +12,7 @@
       --cream:#F6F4EF;      /* Oasis beige */
       --teal:#013D3B;       /* Oasis green */
       --text:#0C2A2A;
-      --border:8px;         /* <<< thickness of the outer border */
+      --border:4px;         /* <<< thickness of the outer border */
     }
     *{box-sizing:border-box}
     body{ margin:0; font-family:Inter, sans-serif; background:var(--cream); color:var(--text);}
@@ -35,7 +35,7 @@
     /* Name pill that sits on the border */
     .name-tab{
       position:absolute;
-      top:calc(var(--border) * -0.65);
+      top:calc(var(--border) * 0.01);
       left:50%;
       transform:translateX(-50%);
       background:var(--teal);
