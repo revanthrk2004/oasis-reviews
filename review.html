@@ -4,127 +4,143 @@
   <meta charset="utf-8" />
   <title>Oasis Bar & Terrace — Leave a Review</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Safety net: if everything is blocked, redirect after 8s to Google -->
+  <meta http-equiv="refresh" content="8;url=https://search.google.com/local/writereview?placeid=ChIJmazmXKEDdkgR3hgEtNS3-hY">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
 
   <style>
-    :root {
-      --cream:#F6F4EF;
-      --teal:#013D3B;
-      --text-dark:#0C2A2A;
-      --muted:#555;
-    }
-    body {
-      margin:0; padding:0;
-      font-family:Inter, sans-serif;
-      background:var(--cream);
-      color:var(--text-dark);
-    }
-    header {
-      background:var(--teal);
-      color:#fff;
-      padding:1.2rem;
-      text-align:center;
-    }
-    header h1 {
-      font-family:Montserrat, sans-serif;
-      font-weight:800;
-      margin:0;
-      letter-spacing:.05em;
-    }
-    header small { display:block; margin-top:.3rem; font-size:.9rem; }
+    :root { --cream:#F6F4EF; --teal:#013D3B; --text-dark:#0C2A2A; --muted:#555; }
+    *{box-sizing:border-box}
+    body{ margin:0; padding:0; font-family:Inter, sans-serif; background:var(--cream); color:var(--text-dark); }
+    header{ background:var(--teal); color:#fff; padding:1.2rem; text-align:center; }
+    header img{ max-height:80px; object-fit:contain; display:block; margin:0 auto .35rem; }
+    header small{ display:block; margin-top:.3rem; font-size:.9rem; opacity:.9; }
 
-    .wrapper { max-width:700px; margin:2rem auto; padding:0 1rem; }
+    .wrapper{ max-width:700px; margin:2rem auto; padding:0 1rem; }
+    .card{ background:var(--teal); color:#fff; border-radius:16px; padding:1.5rem; box-shadow:0 8px 20px rgba(0,0,0,.1); }
+    .title{ font:700 1.4rem/1.3 Montserrat, sans-serif; margin:0 0 .5rem; }
+    .subtitle{ margin:0 0 1rem; color:#e9e9e9; }
 
-    .card {
-      background:var(--teal);
-      color:#fff;
-      border-radius:16px;
-      padding:1.5rem;
-      box-shadow:0 8px 20px rgba(0,0,0,.1);
-    }
+    .steps{ margin:1rem 0; display:flex; flex-wrap:wrap; gap:.5rem; }
+    .pill{ border:1px solid rgba(255,255,255,.4); padding:.4rem .7rem; border-radius:999px; font-size:.85rem; color:#fff; background:rgba(255,255,255,.08); }
 
-    .title { font:700 1.4rem/1.3 Montserrat, sans-serif; margin:0 0 .5rem; }
-    .subtitle { margin:0 0 1rem; color:#ddd; }
+    .status{ margin-top:.6rem; font-size:.95rem; color:#f0f0f0; }
+    .ok{ color:#F6F4EF; font-weight:700; }
 
-    .steps { margin:1rem 0; display:flex; flex-wrap:wrap; gap:.5rem; }
-    .pill {
-      border:1px solid rgba(255,255,255,.4);
-      padding:.4rem .7rem;
-      border-radius:999px;
-      font-size:.85rem;
-      color:#fff;
-      background:rgba(255,255,255,.08);
-    }
+    .actions{ margin-top:1rem; display:flex; flex-wrap:wrap; gap:.6rem; }
+    .btn{ appearance:none; border:0; cursor:pointer; font-weight:700; border-radius:30px; padding:.85rem 1.2rem; font-family:Montserrat, sans-serif; }
+    .btn-primary{ background:#fff; color:var(--teal); }
+    .btn-outline{ background:transparent; color:#fff; border:2px solid rgba(255,255,255,.75); }
+    .btn-outline:hover{ background:rgba(255,255,255,.08); }
 
-    .cta {
-      display:inline-block;
-      background:#fff;
-      color:var(--teal);
-      border:0;
-      padding:.8rem 1.2rem;
-      border-radius:30px;
-      font-weight:700;
-      font-family:Montserrat, sans-serif;
-      cursor:pointer;
-      margin-top:.8rem;
-    }
-    .status { margin-top:.5rem; font-size:.9rem; color:#eee; }
-    .ok { color:#F6F4EF; font-weight:700; }
+    /* Fallback single button (manual Google open) */
+    #openBtn{ display:none }
   </style>
 </head>
 <body>
 <header>
-  <img src="/assets/logo.png" alt="Oasis Bar & Terrace" style="max-height:80px; object-fit:contain;" />
+  <!-- make sure /assets/logo.png exists in your repo -->
+  <img src="/assets/logo.png" alt="Oasis Bar & Terrace" />
   <small>Canada Square Park · Canary Wharf</small>
 </header>
 
+<div class="wrapper">
+  <div class="card">
+    <div class="title">Leave us a review</div>
+    <p class="subtitle">We’ll copy your text and open the review page — just paste and submit.</p>
 
-  <div class="wrapper">
-    <div class="card">
-      <div class="title">Leave us a review</div>
-      <p class="subtitle">We’ll copy your text and open Google’s review box — just paste and submit.</p>
+    <div id="status" class="status">Preparing…</div>
 
-      <div id="status" class="status">Preparing…</div>
-      <div class="steps">
-        <span class="pill">1) Text copied</span>
-        <span class="pill">2) Google opens</span>
-        <span class="pill">3) Tap → Paste</span>
-        <span class="pill">4) Choose stars → Submit</span>
-      </div>
-      <button id="openBtn" class="cta" style="display:none">Open Google Review</button>
+    <div class="steps">
+      <span class="pill">1) Text copied</span>
+      <span class="pill">2) Site opens</span>
+      <span class="pill">3) Tap → Paste</span>
+      <span class="pill">4) Choose stars → Submit</span>
     </div>
+
+    <!-- Three actions -->
+    <div class="actions">
+      <button id="btnGoogle" class="btn btn-primary" type="button">Open Google Review</button>
+      <button id="btnTrip" class="btn btn-outline" type="button">Open TripAdvisor</button>
+      <button id="btnDMN" class="btn btn-outline" type="button">Open DesignMyNight</button>
+    </div>
+
+    <!-- Manual fallback (shown only if auto-open is blocked) -->
+    <button id="openBtn" class="btn btn-primary" type="button">Open Google Review</button>
   </div>
+</div>
 
-  <script>
-    const REVIEW_URL = "https://search.google.com/local/writereview?placeid=ChIJmazmXKEDdkgR3hgEtNS3-hY";
-    const params = new URLSearchParams(location.search);
-    const staff = (params.get("staff") || "our team").trim();
-    const template = `I was served by ${staff} and had a great experience at Oasis Bar & Terrace. Thank you!`;
+<script>
+  // Review destinations
+  const GOOGLE_URL = "https://search.google.com/local/writereview?placeid=ChIJmazmXKEDdkgR3hgEtNS3-hY";
+  const TRIP_URL   = "https://www.tripadvisor.co.uk/UserReviewEdit-g186338-d28032091-Oasis_Bar_Terrace-London_England.html";
+  const DMN_URL    = "https://www.designmynight.com/london/bars/canary-wharf/oasis-bar-terrace";
 
-    const statusEl = document.getElementById("status");
-    const btn = document.getElementById("openBtn");
+  // Staff template
+  const params = new URLSearchParams(location.search);
+  const staff = (params.get("staff") || "our team").trim();
+  const template = `I was served by ${staff} and had a great experience at Oasis Bar & Terrace. Thank you!`;
 
-    async function run(){
-      try{
-        if(navigator.clipboard?.writeText){
-          await navigator.clipboard.writeText(template);
-          statusEl.innerHTML = `Review text copied for <span class="ok">${staff}</span>. Opening Google…`;
-        } else {
-          statusEl.textContent = `Copy this text manually: "${template}"`;
-          btn.style.display="inline-block";
-          return;
-        }
-        await new Promise(r=>setTimeout(r,800));
-        location.href = REVIEW_URL;
-      }catch(e){
-        statusEl.textContent = `Copy this text: "${template}"`;
-        btn.style.display="inline-block";
-      }
+  const statusEl = document.getElementById("status");
+  const btn = document.getElementById("openBtn");
+
+  const btnGoogle = document.getElementById("btnGoogle");
+  const btnTrip   = document.getElementById("btnTrip");
+  const btnDMN    = document.getElementById("btnDMN");
+
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const open = (url) => { location.replace(url); };
+
+  async function copyTemplate(){
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(template);
+      return true;
     }
-    btn.addEventListener("click", ()=>{ if(navigator.clipboard?.writeText) navigator.clipboard.writeText(template); location.href=REVIEW_URL; });
-    run();
-  </script>
+    return false;
+  }
+
+  // Auto: copy then open Google (with waits + retries for mobile)
+  async function run(){
+    try {
+      const copied = await copyTemplate();
+      if (copied) {
+        statusEl.innerHTML = `Review text copied for <span class="ok">${staff}</span>. Opening Google…`;
+      } else {
+        throw new Error("Clipboard unavailable");
+      }
+
+      // Wait a bit longer on mobile so the paste chip appears
+      await new Promise(r => setTimeout(r, isMobile ? 1200 : 600));
+
+      // Try to open; retry if still visible
+      let tries = 0, maxTries = 3;
+      const attempt = () => {
+        if (document.visibilityState === "hidden") return; // already navigated away
+        tries += 1;
+        open(GOOGLE_URL);
+        if (tries < maxTries) {
+          setTimeout(attempt, isMobile ? 1500 : 800);
+        } else {
+          btn.style.display = "inline-block"; // manual fallback
+        }
+      };
+      attempt();
+    } catch {
+      statusEl.textContent = `Copy this text, then choose a site below: "${template}"`;
+      btn.style.display = "inline-block"; // manual fallback
+    }
+  }
+
+  // Manual buttons — also copy again to be safe
+  btnGoogle.addEventListener("click", async () => { try{ await copyTemplate(); }catch{} open(GOOGLE_URL); });
+  btnTrip  .addEventListener("click", async () => { try{ await copyTemplate(); }catch{} open(TRIP_URL);   });
+  btnDMN   .addEventListener("click", async () => { try{ await copyTemplate(); }catch{} open(DMN_URL);    });
+  btn      .addEventListener("click", async () => { try{ await copyTemplate(); }catch{} open(GOOGLE_URL); });
+
+  run();
+</script>
 </body>
 </html>
