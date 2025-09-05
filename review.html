@@ -50,7 +50,7 @@
 <div class="wrapper">
   <div class="card">
     <div class="title">Leave us a review</div>
-    <p class="subtitle">We’ll prepare your text automatically. Choose where you’d like to leave your review below.</p>
+    <p class="subtitle">We’ve prepared a short message for you. Choose where you’d like to leave your review below, then paste and submit.</p>
 
     <div id="copiedText" class="copyline" aria-live="polite"></div>
 
@@ -82,40 +82,23 @@
   const staff = (params.get("staff") || "our team").trim();
   const template = `I was served by ${staff} and had a great experience at Oasis Bar & Terrace. Thank you!`;
 
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const statusEl = document.getElementById("status");
   const copiedEl = document.getElementById("copiedText");
 
-  function open(url){ location.replace(url); }
+  function open(url){ location.href = url; } // manual only
 
-  async function copyTemplate(){
+  async function copyTemplate() {
     try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(template);
-      }
-    } catch { /* silently ignore; we stay neutral */ }
+      if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(template); }
+    } catch { /* ignore – UI stays neutral */ }
   }
 
-  // Prepare text; if browser allows, try to auto-open Google once
+  // Prepare the text (no auto-navigation)
   (async function init(){
     copiedEl.textContent = `“${template}”`;
-    copyTemplate(); // fire & forget; if it fails, we keep neutral UI
-
-    // Optional gentle auto-open (does nothing if blocked)
-    await new Promise(r => setTimeout(r, isMobile ? 1200 : 600));
-    try {
-      open(GOOGLE_URL);
-      setTimeout(() => {
-        if (document.visibilityState !== "hidden") {
-          statusEl.textContent = "Choose where you’d like to leave your review:";
-        }
-      }, isMobile ? 1800 : 900);
-    } catch {
-      statusEl.textContent = "Choose where you’d like to leave your review:";
-    }
+    copyTemplate(); // quiet attempt
   })();
 
-  // Buttons — try copy again (if allowed) then open
+  // Buttons — copy again (quietly) then open chosen site
   document.getElementById("btnGoogle").addEventListener("click", async ()=>{ try{await copyTemplate();}catch{} open(GOOGLE_URL); });
   document.getElementById("btnTrip").addEventListener("click",   async ()=>{ try{await copyTemplate();}catch{} open(TRIP_URL);   });
   document.getElementById("btnDMN").addEventListener("click",    async ()=>{ try{await copyTemplate();}catch{} open(DMN_URL);    });
