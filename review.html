@@ -10,17 +10,11 @@
 
   <style>
     :root{
-      --cream:#F6F4EF;
-      --teal:#013D3B;
-      --text:#0C2A2A;
-      --muted:#e9e9e9;
-
-      /* Brand-ish button colors */
-      --google:#4285F4;      /* Google blue */
-      --trip:#34E0A1;        /* TripAdvisor green */
-      --dmn:#4D2C91;         /* DesignMyNight purple */
+      --cream:#F6F4EF; --teal:#013D3B; --text:#0C2A2A; --muted:#e9e9e9;
+      --google:#4285F4;   /* Google blue */
+      --trip:#34E0A1;     /* TripAdvisor green */
+      --dmn:#4D2C91;      /* DesignMyNight purple */
     }
-
     *{box-sizing:border-box}
     body{ margin:0; font-family:Inter, sans-serif; background:var(--cream); color:var(--text); }
     header{ background:var(--teal); color:#fff; padding:1.2rem; text-align:center; }
@@ -36,6 +30,7 @@
     .steps{ margin:.6rem 0 1rem; display:flex; flex-wrap:wrap; gap:.5rem }
     .pill{ border:1px solid rgba(255,255,255,.35); padding:.4rem .7rem; border-radius:999px; font-size:.85rem; background:transparent }
 
+    .status{ margin-top:.5rem; font-size:.95rem; color:#f0f0f0 }
     .actions{ display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.6rem }
     .btn{ appearance:none; border:0; cursor:pointer; font-weight:800; border-radius:28px; padding:.85rem 1.2rem; font-family:Montserrat, sans-serif; color:#fff }
     .btn-google{ background:var(--google) }
@@ -44,14 +39,10 @@
     .btn-trip:hover{ filter:brightness(1.06) }
     .btn-dmn{ background:var(--dmn) }
     .btn-dmn:hover{ filter:brightness(1.06) }
-
-    .status{ margin-top:.5rem; font-size:.95rem; color:#f0f0f0 }
-    .ok{ font-weight:700; color:#fff }
   </style>
 </head>
 <body>
 <header>
-  <!-- make sure this path exists in your repo -->
   <img src="/assets/logo.png" alt="Oasis Bar & Terrace" />
   <small>Canada Square Park · Canary Wharf</small>
 </header>
@@ -59,18 +50,18 @@
 <div class="wrapper">
   <div class="card">
     <div class="title">Leave us a review</div>
-    <p class="subtitle">We’ll copy your text automatically. If it doesn’t jump to Google in a moment, just tap one of the buttons below.</p>
+    <p class="subtitle">We’ll prepare your text automatically. Choose where you’d like to leave your review below.</p>
 
     <div id="copiedText" class="copyline" aria-live="polite"></div>
 
     <div class="steps">
-      <span class="pill">1) Text copied</span>
-      <span class="pill">2) Site opens</span>
+      <span class="pill">1) Text ready</span>
+      <span class="pill">2) Pick a site</span>
       <span class="pill">3) Tap → Paste</span>
-      <span class="pill">4) Choose stars → Submit</span>
+      <span class="pill">4) Stars → Submit</span>
     </div>
 
-    <div id="status" class="status">Preparing…</div>
+    <div id="status" class="status">Choose where you’d like to leave your review:</div>
 
     <div class="actions">
       <button id="btnGoogle" class="btn btn-google" type="button">Open Google Review</button>
@@ -98,38 +89,33 @@
   function open(url){ location.replace(url); }
 
   async function copyTemplate(){
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(template);
-      return true;
-    }
-    return false;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(template);
+      }
+    } catch { /* silently ignore; we stay neutral */ }
   }
 
-  // Auto: copy → short wait → try Google once
-  (async function run(){
+  // Prepare text; if browser allows, try to auto-open Google once
+  (async function init(){
     copiedEl.textContent = `“${template}”`;
+    copyTemplate(); // fire & forget; if it fails, we keep neutral UI
+
+    // Optional gentle auto-open (does nothing if blocked)
+    await new Promise(r => setTimeout(r, isMobile ? 1200 : 600));
     try {
-      const copied = await copyTemplate();
-      if (copied) {
-        statusEl.innerHTML = `Review text copied for <span class="ok">${staff}</span>. Opening Google…`;
-      } else {
-        statusEl.textContent = "Copy failed on this device — please tap a button below.";
-        return;
-      }
-      await new Promise(r => setTimeout(r, isMobile ? 1200 : 600));
       open(GOOGLE_URL);
-      // If navigation is blocked, user can tap buttons below.
       setTimeout(() => {
         if (document.visibilityState !== "hidden") {
-          statusEl.textContent = "If it didn’t open, tap one of the buttons below.";
+          statusEl.textContent = "Choose where you’d like to leave your review:";
         }
       }, isMobile ? 1800 : 900);
     } catch {
-      statusEl.textContent = "Copy failed — please tap a button below.";
+      statusEl.textContent = "Choose where you’d like to leave your review:";
     }
   })();
 
-  // Buttons — re-copy (for safety) then open
+  // Buttons — try copy again (if allowed) then open
   document.getElementById("btnGoogle").addEventListener("click", async ()=>{ try{await copyTemplate();}catch{} open(GOOGLE_URL); });
   document.getElementById("btnTrip").addEventListener("click",   async ()=>{ try{await copyTemplate();}catch{} open(TRIP_URL);   });
   document.getElementById("btnDMN").addEventListener("click",    async ()=>{ try{await copyTemplate();}catch{} open(DMN_URL);    });
