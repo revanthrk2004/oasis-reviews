@@ -88,8 +88,11 @@
 
   // Staff message
   const params = new URLSearchParams(location.search);
-  const staff = (params.get("staff") || "our team").trim();
-  const template = `I was served by ${staff} and had a great experience at Oasis Bar & Terrace. Thank you!`;
+  const staff = (params.get("staff") || "").trim();
+  const template = staff
+    ? `I was served by ${staff} and had a great experience at Oasis Bar & Terrace. Thank you!`
+    : `I had a great experience at Oasis Bar & Terrace. Thank you!`;
+
 
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const statusEl = document.getElementById("status");

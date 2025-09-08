@@ -32,6 +32,9 @@
       box-shadow:0 6px 16px rgba(0,0,0,.08);
     }
 
+
+    .card.no-tab{ padding-top:1.1rem; }
+    
     /* Name pill that sits on the border */
     .name-tab{
       position:absolute;
@@ -87,18 +90,24 @@
 <script src="https://unpkg.com/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
   const BASE = "https://oasis-reviews.vercel.app/review.html";
-  const STAFF = ["Anish","Brad","Callum","Chanakya","Jamel","Aisha","Ali","Anik","Chandrika","Chloe","Chola","Darani","Dasha","Teddy","Faye","Sai","Kartheek","Kiran","Laurynas","Lewis","Matin","Bora","Osaro","Petar","Revanth","Rhianna","Stefano","Sufaila","Roman","Tommi","Tre"];
+  const STAFF = ["Team","Anish","Brad","Callum","Chanakya","Jamel","Aisha","Ali","Anik","Chandrika","Chloe","Chola","Darani","Dasha","Teddy","Faye","Sai","Kartheek","Kiran","Laurynas","Lewis","Matin","Bora","Osaro","Petar","Revanth","Rhianna","Stefano","Sufaila","Roman","Tommi","Tre"];
 
   const NOTE_TEXT = "Had a good time? A quick review goes a long way, thank you!";
 
-  function makeCard(name, url){
+  function makeCard(name, url, isTeam){
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className = 'card' + (isTeam ? ' no-tab' : '');
 
-    // Name ON the border
-    const nameTab = document.createElement('div');
-    nameTab.className = 'name-tab';
-    nameTab.textContent = name;
+
+
+    if (!isTeam) {
+      const nameTab = document.createElement('div');
+      nameTab.className = 'name-tab';
+      nameTab.textContent = name;
+      card.appendChild(nameTab);
+    }
+
+ 
 
     // Note (polite line)
     const note = document.createElement('div');
@@ -116,7 +125,7 @@
     logo.className = 'brandlogo';
 
     
-    card.appendChild(nameTab);
+    
     card.appendChild(note);
     card.appendChild(qrWrap);
     card.appendChild(logo);
@@ -127,8 +136,9 @@
 
   const grid = document.getElementById('grid');
   STAFF.forEach(n => {
-    const url = `${BASE}?staff=${encodeURIComponent(n)}`;
-    grid.appendChild(makeCard(n, url));
+    const isTeam = n.toLowerCase() === 'team';
+    const url = isTeam ? BASE : `${BASE}?staff=${encodeURIComponent(n)}`;
+    grid.appendChild(makeCard(n, url, isTeam));
   });
 </script>
 </body>
